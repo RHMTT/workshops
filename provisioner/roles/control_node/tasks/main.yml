@@ -80,7 +80,39 @@
     - "{{ansible_user}}"
     - "{{username}}"
   when: username != "root"
+  
+- name: make sure .ssh is created
+  file:
+    path: "/{{username}}/.ssh/"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    state: directory
+  when: username == "root"
 
+- name: copy over ssh config file
+  template:
+    src: sshconfig.j2
+    dest: /{{item}}/.ssh/config
+    owner: "{{item}}"
+    group: "{{item}}"
+    mode: 0700
+  loop:
+    - "{{ansible_user}}"
+    - "{{username}}"
+  when: username == "root"
+
+- name: Put ssh-key in proper spot for student
+  copy:
+    src: "{{ playbook_dir }}/{{ec2_name_prefix}}/{{ec2_name_prefix}}-private.pem"
+    dest: "/{{item}}/.ssh/aws-private.pem"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: 0400
+  loop:
+    - "{{ansible_user}}"
+    - "{{username}}"
+  when: username == "root"
+  
 # FIXME: This should probably be refactored to use things like the following
 # instead of hard coding
 #
