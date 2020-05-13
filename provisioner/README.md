@@ -4,8 +4,9 @@ The `github.com/ansible/workshops` contains an Ansible Playbook `provision_lab.y
 
 | Workshop | Workshop Type Var   |
 |---|---|
-| Ansible Red Hat Enterprise Linux Workshop | `workshop_type: rhel`  |
-| Ansible Network Automation Workshop | `workshop_type: networking`  |
+| Ansible for Red Hat Enterprise Linux Workshop | `workshop_type: rhel`  |
+| Ansible for Red Hat Enterprise Linux Workshop - 90 minutes  | `workshop_type: rhel_90`    |
+| Ansible Network Automation Workshop | `workshop_type: network`  |
 | Ansible F5 Workshop | `workshop_type: f5`   |
 | Ansible Security Automation | `workshop_type: security`   |
 | Ansible Windows Automation  | `workshop_type: windows`    |
@@ -17,6 +18,7 @@ The `github.com/ansible/workshops` contains an Ansible Playbook `provision_lab.y
   - [Setup (per workshop)](#setup-per-workshop)
   - [Accessing student documentation and slides](#Accessing-student-documentation-and-slides)
 - [Lab Teardown](#aws-teardown)
+- [Demos](#demos)
 - [FAQ](../docs/faq.md)
 - [More info on what is happening](#more-info-on-what-is-happening)
 - [Remote Desktop](#remote-desktop)
@@ -47,7 +49,7 @@ ec2_name_prefix: TESTWORKSHOP
 # creates student_total of workbenches for the workshop
 student_total: 2
 
-# Set the right workshop type, like networking, rhel or f5 (see above)
+# Set the right workshop type, like network, rhel or f5 (see above)
 workshop_type: rhel
 
 #####OPTIONAL VARIABLES
@@ -55,8 +57,8 @@ workshop_type: rhel
 # turn DNS on for control nodes, and set to type in valid_dns_type
 dns_type: aws
 
-# password for Ansible control node, defaults to ansible
-admin_password: ansible
+# password for Ansible control node
+admin_password: your_password123
 
 # creates AWS S3 website for ec2_name_prefix.workshop_dns_zone
 create_login_page: true
@@ -69,6 +71,9 @@ towerinstall: true
 
 # automatically licenses Tower if license is provided
 autolicense: true
+
+# IBM Community Grid - defaults to true if you don't tell the provisioner
+ibm_community_grid: false
 ```
 
 If you want to license it you must copy a license called tower_license.json into this directory.  If you do not have a license already please request one using the [Workshop License Link](https://www.ansible.com/workshop-license).
@@ -76,9 +81,12 @@ If you want to license it you must copy a license called tower_license.json into
 For more extra_vars examples, look at the following:
 - [sample-vars-rhel.yml](sample_workshops/sample-vars-rhel.yml) - example for the Ansible RHEL Workshop
 - [sample-vars-windows.yml](sample_workshops/sample-vars-windows.yml) - example for the **Ansible Windows Workshop**
-- [sample-vars-networking.yml](sample_workshops/sample-vars-networking.yml) - example for the **Ansible Network Workshop**
+- [sample-vars-network.yml](sample_workshops/sample-vars-network.yml) - example for the **Ansible Network Workshop**
 - [sample-vars-f5.yml](sample_workshops/sample-vars-f5.yml) - example for **Ansible F5 Workshop**
 - [sample-vars-tower-auto.yml](sample_workshops/sample-vars-tower-auto.yml) - example for Tower installation and licensing
+- [sample-vars-rhel-90.yml](sample_workshops/sample-vars-tower-auto.yml) - example for Tower installation and licensing
+- [sample-vars-rhel-90.yml](sample_workshops/sample-vars-rhel-90.yml) - example for `rhel_90` workshop, meant to be taught in 90 minutes
+
 
 2. Run the playbook:
 
@@ -127,6 +135,18 @@ To destroy all the EC2 instances after training is complete:
 
         ansible-playbook teardown_lab.yml -e @extra_vars.yml -e debug_teardown=true
 
+# Demos
+
+There is a variable you can pass in within your extra_vars named `demo`.  When this keyword is defined it will install the specified demo from the Github repository [https://github.com/ansible/product-demos](https://github.com/ansible/product-demos).  
+
+For example you can put:
+
+```
+demo: all
+```
+
+Which will install all demos onto the Ansible Tower instance.  Not all demos will work on any `workshop_type`.  Please refer to the [Demo repository list](https://github.com/ansible/product-demos#demo-repository).
+
 # FAQ
 
 For frequently asked questions see the [FAQ](../docs/faq.md)
@@ -143,12 +163,6 @@ What does the AWS provisioner take care of automatically?
 - Creation of an internet gateway for the VPC
 - Creation of route table for VPC (for reachability from internet)
 
-# Remote Desktop
-
-If you used `xrdp: true` you will the ability to remote desktop to the control node.
-
-The provisioner has the ability to install [xrdp](http://www.xrdp.org/) with [xfce](https://xfce.org/) for graphical interface. The xrdp application is a an open source remote desktop protocol(rdp) server. Xfce is a lightweight desktop environment for UNIX-like operating systems. It aims to be fast and low on system resources, while still being visually appealing and user friendly.
-
 # Getting Help
 
-Please file issues on Github.  Please fill out all required information.  Your issue will be closed if there if you skip required information in the Github issues template.
+Please [file issues on Github](https://github.com/ansible/workshops/issues).  Please fill out all required information.  Your issue will be closed if you skip required information in the Github issues template.

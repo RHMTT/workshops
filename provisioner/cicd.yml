@@ -1,0 +1,23 @@
+---
+- name: configure rhel workshop for webservers
+  hosts: lab_hosts
+  become: true
+  gather_facts: false
+  tasks:
+    - name: configure RHEL webservers
+      include_role:
+        name: webservers
+
+- name: Configure GitLab Host
+  hosts: gitlab
+  become: true
+  gather_facts: true
+  tags:
+    - gitlab
+  tasks:
+    - include_role:
+        name: common
+    - include_role:
+        name: geerlingguy.gitlab
+    - include_role:
+        name: gitlab-server

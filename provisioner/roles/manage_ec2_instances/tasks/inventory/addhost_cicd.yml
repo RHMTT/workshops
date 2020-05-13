@@ -1,0 +1,84 @@
+---
+################### Get workshop nodes info ###################
+
+- name: grab facts for Gitlab
+  ec2_instance_info:
+    region: "{{ ec2_region }}"
+    filters:
+      instance-state-name: running
+      "tag:Workshop_gitlab": "{{ec2_name_prefix}}-gitlab"
+  register: gitlab_node_facts
+
+- name: grab facts for node1 node
+  ec2_instance_info:
+    region: "{{ ec2_region }}"
+    filters:
+      instance-state-name: running
+      "tag:Workshop_node1": "{{ec2_name_prefix}}-node1"
+  register: node1_node_facts
+
+- name: grab facts for node2 node
+  ec2_instance_info:
+    region: "{{ ec2_region }}"
+    filters:
+      instance-state-name: running
+      "tag:Workshop_node2": "{{ec2_name_prefix}}-node2"
+  register: node2_node_facts
+
+- name: grab facts for node3 node
+  ec2_instance_info:
+    region: "{{ ec2_region }}"
+    filters:
+      instance-state-name: running
+      "tag:Workshop_node3": "{{ec2_name_prefix}}-node3"
+  register: node3_node_facts
+
+################### Create inventories ###################
+
+- name: GitLab | Add new instance to host group
+  add_host:
+    hostname: 'gitlab'
+    short_name: "{{ item.tags.short_name }}"
+    username: "{{ item.tags.username }}"
+    ansible_user: "{{ item.tags.username }}"
+    ansible_ssh_private_key_file: "{{ playbook_dir }}/{{ ec2_name_prefix }}/{{ ec2_name_prefix }}-private.pem"
+    ansible_host: "{{ item.public_ip_address }}"
+    private_ip: "{{ item.private_ip_address }}"
+    groups:
+      - gitlab
+  with_items: "{{ gitlab_node_facts.instances }}"
+
+- name: add hosts to groups (ANSIBLE RHEL MODE)
+  add_host:
+    name: "{{ item.tags.Name }}"
+    username: "{{ item.tags.Student }}"
+    short_name: "{{ item.tags.short_name }}"
+    ansible_host: "{{ item.public_ip_address }}"
+    ansible_user: "{{ item.tags.username }}"
+    ansible_port: "{{ ssh_port }}"
+    ansible_ssh_private_key_file: "{{ playbook_dir }}/{{ec2_name_prefix}}/{{ec2_name_prefix}}-private.pem"
+    groups: lab_hosts,managed_nodes
+  with_items:
+    - "{{ node1_node_facts.instances }}"
+    - "{{ node2_node_facts.instances }}"
+    - "{{ node3_node_facts.instances }}"
+  changed_when: false
+
+################### Write inventories ###################
+
+- name: Generate instructor inventory
+  template:
+    src: instructor_inventory.j2
+    dest: "{{ playbook_dir }}/{{ec2_name_prefix}}/instructor_inventory.txt"
+
+- name: Generate student etchosts
+  template:
+    src: etchosts_rhel.j2
+    dest: "{{ playbook_dir }}/{{ec2_name_prefix}}/student{{item}}-etchosts.txt"
+  with_sequence: count="{{ student_total }}"
+
+- name: Generate student inventories
+  template:
+    src: instances.txt.j2
+    dest: "{{ playbook_dir }}/{{ec2_name_prefix}}/student{{item}}-instances.txt"
+  with_sequence: count="{{ student_total }}"

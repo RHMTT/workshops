@@ -55,7 +55,6 @@
     owner: "{{ username }}"
     group: "{{ username }}"
     state: directory
-  when: username != "root"
 
 - name: copy over ssh config file
   template:
@@ -67,7 +66,6 @@
   loop:
     - "{{ansible_user}}"
     - "{{username}}"
-  when: username != "root"
 
 - name: Put ssh-key in proper spot for student
   copy:
@@ -79,52 +77,13 @@
   loop:
     - "{{ansible_user}}"
     - "{{username}}"
-  when: username != "root"
-  
-- name: make sure .ssh is created
-  file:
-    path: "/{{username}}/.ssh/"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    state: directory
-  when: username == "root"
 
-- name: copy over ssh config file
-  template:
-    src: sshconfig.j2
-    dest: /{{item}}/.ssh/config
-    owner: "{{item}}"
-    group: "{{item}}"
-    mode: 0700
-  loop:
-    - "{{ansible_user}}"
-    - "{{username}}"
-  when: username == "root"
-
-- name: Put ssh-key in proper spot for student
-  copy:
-    src: "{{ playbook_dir }}/{{ec2_name_prefix}}/{{ec2_name_prefix}}-private.pem"
-    dest: "/{{item}}/.ssh/aws-private.pem"
-    owner: "{{ item }}"
-    group: "{{ item }}"
-    mode: 0400
-  loop:
-    - "{{ansible_user}}"
-    - "{{username}}"
-  when: username == "root"
-  
-# FIXME: This should probably be refactored to use things like the following
-# instead of hard coding
-#
-#   command: cp -r /tmp/linklight/exercises/{{workshop_type}}/ /home/{{ username }}/{{workshop_type}}-workshop/
-#
-# That would enable a more generic role/scaffolding
-- name: clean out /tmp/linklight
+- name: clean out /tmp/workshops
   file:
-    path: /tmp/linklight
+    path: /tmp/workshops
     state: absent
 
-- name: Clone workshops repo (NETWORKING MODE)
+- name: Clone workshops repo
   git:
     accept_hostkey: true
     clone: true
@@ -136,18 +95,31 @@
 
 - name: Move relevant exercises to correct location
   copy:
-    src: "/tmp/workshops/exercises/ansible_{{workshop_type}}/"
-    dest: "/home/{{ username }}/{{workshop_type}}-workshop"
+    src: '{{ "/tmp/workshops/" + exercise_src_location | default("exercises/ansible_" + workshop_type) + "/" }}'
+    dest: '{{ "/home/" + username + "/" + exercise_dest_location | default(workshop_type + "-workshop") }}'
     remote_src: true
     owner: "{{ username }}"
     group: "{{ username }}"
-  when:
-    - workshop_type != "f5"
-    - workshop_type != "networking"
-## need to fix the conditionals above https://github.com/ansible/workshops/issues/743
+    local_follow: true
+
+- name: Create lab inventory directory
+  file:
+    state: directory
+    path: /home/{{ username }}/lab_inventory
+
+- name: Put student inventory in proper spot
+  copy:
+    src: "{{ playbook_dir }}/{{ec2_name_prefix}}/{{ username }}-instances.txt"
+    dest: /home/{{ username }}/lab_inventory/hosts
+    owner: "{{ username }}"
+    group: "{{ username }}"
+  when: username in inventory_hostname
 
 - name: setup control node for workshop type
-  include_tasks: "{{workshop_type}}.yml"
+  include_tasks: "{{item}}"
+  with_first_found:
+    - "{{role_path}}/tasks/{{workshop_type}}.yml"
+    - "{{role_path}}/tasks/unsupported_workshop.yml"
 
 - name: check to see if ansible tower is already up and running
   uri:
@@ -193,7 +165,3 @@
   when:
     - autolicense is defined
     - autolicense|bool
-
-- name: INSTALL VSCODE AND XRDP
-  include_tasks: gui.yml
-  when: xrdp|bool

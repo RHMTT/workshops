@@ -1,19 +1,7 @@
 ---
-# Inventory
-- name: Create inventory
-  tower_inventory:
-    name: "Workshop Inventory"
-    organization: "Default"
-    tower_username: admin
-    tower_password: "{{ admin_password }}"
-    tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
-
-- name: Import existing inventory into Tower
-  command: "awx-manage inventory_import --source=/home/{{ username }}/lab_inventory/hosts --inventory-id=2"
-
 # Teams
 - name: Create analyst team
-  tower_team:
+  awx.awx.tower_team:
     name: "TeamSIEM"
     description: "Analysts Team"
     organization: "Default"
@@ -23,7 +11,7 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Create IDS team
-  tower_team:
+  awx.awx.tower_team:
     name: "TeamIDS"
     description: "IDS Team"
     organization: "Default"
@@ -33,7 +21,7 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Create Firewall team
-  tower_team:
+  awx.awx.tower_team:
     name: "TeamFIREWALL"
     description: "Firewall Team"
     organization: "Default"
@@ -44,7 +32,7 @@
 
 # Users
 - name: Add user analyst
-  tower_user:
+  awx.awx.tower_user:
     username: analyst
     password: "{{ admin_password }}"
     email: analyst@redhat.com
@@ -57,7 +45,7 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Add user opsids
-  tower_user:
+  awx.awx.tower_user:
     username: opsids
     password: "{{ admin_password }}"
     email: opsids@redhat.com
@@ -70,7 +58,7 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Add user opsfirewall
-  tower_user:
+  awx.awx.tower_user:
     username: opsfirewall
     password: "{{ admin_password }}"
     email: opsfirewall@redhat.com
@@ -84,7 +72,7 @@
 
 # Assign users to default org
 - name: Ensure that user analyst belongs to the Default org
-  tower_role:
+  awx.awx.tower_role:
     user: analyst
     organization: "Default"
     role: member
@@ -94,7 +82,7 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Ensure that user opsids belongs to the Default org
-  tower_role:
+  awx.awx.tower_role:
     user: opsids
     organization: "Default"
     role: member
@@ -104,7 +92,7 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Ensure that user opsfirewall belongs to the Default org
-  tower_role:
+  awx.awx.tower_role:
     user: opsfirewall
     organization: "Default"
     role: member
@@ -115,7 +103,7 @@
 
 # Teams assignment
 - name: Assign analyst to group TeamSIEM
-  tower_role:
+  awx.awx.tower_role:
     user: analyst
     target_team: "TeamSIEM"
     role: member
@@ -125,7 +113,7 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Assign opsids to group TeamIDS
-  tower_role:
+  awx.awx.tower_role:
     user: opsids
     target_team: "TeamIDS"
     role: member
@@ -135,23 +123,11 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Assign opsfirewall to group TeamFirewall
-  tower_role:
+  awx.awx.tower_role:
     user: opsfirewall
     target_team: "TeamFIREWALL"
     role: member
     state: present
-    tower_username: admin
-    tower_password: "{{ admin_password }}"
-    tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
-
-# Credentials
-- name: Add ec2-user credential to Tower
-  tower_credential:
-    username: ec2-user
-    name: "ec2-user credential"
-    ssh_key_data: "{{ lookup('file', playbook_dir +'/' + ec2_name_prefix + '/' + ec2_name_prefix + '-private.pem') }}"
-    kind: ssh
-    organization: "Default"
     tower_username: admin
     tower_password: "{{ admin_password }}"
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
@@ -172,7 +148,7 @@
 
 # Job templates
 - name: Job template sending firewall logs to QRadar
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "Send firewall logs to QRadar"
     job_type: "run"
     inventory: "Workshop Inventory"
@@ -185,7 +161,7 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Job template sending IDPS logs to QRadar
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "Send IDPS logs to QRadar"
     job_type: "run"
     inventory: "Workshop Inventory"
@@ -193,14 +169,14 @@
     playbook: "idps_log.yml"
     state: "present"
     limit: "snort"
-    credential: "ec2-user credential"
+    credential: "Workshop Credential"
     become_enabled: true
     tower_username: admin
     tower_password: "{{ admin_password }}"
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Job template accepting firewall logs in QRadar
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "Accept firewall logs in QRadar"
     job_type: "run"
     inventory: "Workshop Inventory"
@@ -213,7 +189,7 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Job template accepting IDPS logs in QRadar
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "Accept IDPS logs in QRadar"
     job_type: "run"
     inventory: "Workshop Inventory"
@@ -226,20 +202,20 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Job template rolling back everything
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "Roll back all changes"
     job_type: "run"
     inventory: "Workshop Inventory"
     project: "Workshop Project"
     playbook: "rollback.yml"
     state: "present"
-    credential: "ec2-user credential"
+    credential: "Workshop Credential"
     tower_username: admin
     tower_password: "{{ admin_password }}"
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Job template adding DDOS IDPS rule
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "Add IDPS rule"
     job_type: "run"
     inventory: "Workshop Inventory"
@@ -247,7 +223,7 @@
     playbook: "snort_rule.yml"
     state: "present"
     limit: "snort"
-    credential: "ec2-user credential"
+    credential: "Workshop Credential"
     become_enabled: true
     survey_enabled: true
     survey_spec: "{{ lookup('template', 'security_survey_ids_rule.json') }}"
@@ -256,7 +232,7 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Job template adding ddos attack simulation
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "Start DDOS attack simulation"
     job_type: "run"
     inventory: "Workshop Inventory"
@@ -264,14 +240,14 @@
     playbook: "ddos_attack_simulation.yml"
     state: "present"
     limit: "attacker"
-    credential: "ec2-user credential"
+    credential: "Workshop Credential"
     become_enabled: true
     tower_username: admin
     tower_password: "{{ admin_password }}"
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Job template stopping ddos attack simulation
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "Stop DDOS attack simulation"
     job_type: "run"
     inventory: "Workshop Inventory"
@@ -279,14 +255,14 @@
     playbook: "ddos_stop_simulation.yml"
     state: "present"
     limit: "attacker"
-    credential: "ec2-user credential"
+    credential: "Workshop Credential"
     become_enabled: true
     tower_username: admin
     tower_password: "{{ admin_password }}"
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Job template adding whitelist entry for attacker
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "Whitelist attacker"
     job_type: "run"
     inventory: "Workshop Inventory"
@@ -299,7 +275,7 @@
     tower_host: "{{ username }}.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}"
 
 - name: Job template adding blacklist entry for attacker
-  tower_job_template:
+  awx.awx.tower_job_template:
     name: "Blacklist attacker"
     job_type: "run"
     inventory: "Workshop Inventory"
@@ -313,7 +289,7 @@
 
 # Permissions on Job Templates
 - name: Ensure that opsfirewall has admin rights for own jobs
-  tower_role:
+  awx.awx.tower_role:
     user: opsfirewall
     role: admin
     job_template: "{{ item }}"
@@ -327,7 +303,7 @@
     - "Blacklist attacker"
 
 - name: Ensure that opsfirewall has admin rights for own jobs
-  tower_role:
+  awx.awx.tower_role:
     user: opsids
     role: admin
     job_template: "{{ item }}"
@@ -340,7 +316,7 @@
     - "Add IDPS rule"
 
 - name: Ensure that analyst has admin rights for own jobs
-  tower_role:
+  awx.awx.tower_role:
     user: analyst
     role: admin
     job_template: "{{ item }}"
@@ -353,7 +329,7 @@
     - "Accept IDPS logs in QRadar"
 
 - name: Ensure that analyst can execute IDPS job
-  tower_role:
+  awx.awx.tower_role:
     user: analyst
     role: execute
     job_template: "{{ item }}"
