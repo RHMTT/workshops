@@ -21,3 +21,12 @@
         name: geerlingguy.gitlab
     - include_role:
         name: gitlab-server
+
+- name: Configure GitLab client
+  hosts: control_nodes
+  become: true
+  gather_facts: true
+  tags:
+    - git
+  roles:
+    - cicd_gitlab-client

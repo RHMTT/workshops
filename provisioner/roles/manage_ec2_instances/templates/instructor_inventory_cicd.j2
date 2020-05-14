@@ -26,7 +26,7 @@ ansible_ssh_private_key_file="{{ playbook_dir }}/{{ ec2_name_prefix }}/{{ ec2_na
 {{ host.tags.Name | regex_replace(ec2_name_prefix ~ '-','') }} ansible_host={{ host.public_ip_address }} ansible_user={{ host.tags.username }}
 {% endif %}
 {% endfor %}
-{% for host in node3_node_facts.instances %}
+{% for host in jenkins_node_facts.instances %}
 {% if 'student' ~ number == host.tags.Student %}
 {{ host.tags.Name | regex_replace(ec2_name_prefix ~ '-','') }} ansible_host={{ host.public_ip_address }} ansible_user={{ host.tags.username }}
 {% endif %}

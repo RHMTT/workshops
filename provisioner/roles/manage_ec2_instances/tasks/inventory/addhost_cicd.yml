@@ -25,13 +25,13 @@
       "tag:Workshop_node2": "{{ec2_name_prefix}}-node2"
   register: node2_node_facts
 
-- name: grab facts for node3 node
+- name: grab facts for Jenkins node
   ec2_instance_info:
     region: "{{ ec2_region }}"
     filters:
       instance-state-name: running
-      "tag:Workshop_node3": "{{ec2_name_prefix}}-node3"
-  register: node3_node_facts
+      "tag:Workshop_jenkins": "{{ec2_name_prefix}}-jenkins"
+  register: jenkins_node_facts
 
 ################### Create inventories ###################
 
@@ -61,24 +61,24 @@
   with_items:
     - "{{ node1_node_facts.instances }}"
     - "{{ node2_node_facts.instances }}"
-    - "{{ node3_node_facts.instances }}"
+    - "{{ jenkins_node_facts.instances }}"
   changed_when: false
 
 ################### Write inventories ###################
 
 - name: Generate instructor inventory
   template:
-    src: instructor_inventory.j2
+    src: instructor_inventory_cicd.j2
     dest: "{{ playbook_dir }}/{{ec2_name_prefix}}/instructor_inventory.txt"
 
 - name: Generate student etchosts
   template:
-    src: etchosts_rhel.j2
+    src: etchosts_cicd.j2
     dest: "{{ playbook_dir }}/{{ec2_name_prefix}}/student{{item}}-etchosts.txt"
   with_sequence: count="{{ student_total }}"
 
 - name: Generate student inventories
   template:
-    src: instances.txt.j2
+    src: cicd_instances.txt.j2
     dest: "{{ playbook_dir }}/{{ec2_name_prefix}}/student{{item}}-instances.txt"
   with_sequence: count="{{ student_total }}"

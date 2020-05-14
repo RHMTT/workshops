@@ -13,7 +13,7 @@
 {% endif %}
 {% endfor %}
 
-{% for vm in node3_node_facts.instances %}
+{% for vm in jenkins_node_facts.instances %}
 {% if 'student' + item == vm.tags.Student %}
 {{ vm.public_ip_address }} {{vm.tags.short_name}}
 {% endif %}

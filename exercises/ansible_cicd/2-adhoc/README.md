@@ -11,8 +11,7 @@ Step 1:
 -------
 
 To start, we will need to go to our Inventory. So click **Inventories**
-on the left panel, and then click the name of our Inventory **Windows
-Workshop Inventory**. Now that you are on the Inventory Details page, we
+on the left panel, and then click the name of our Inventory **Workshop Inventory**. Now that you are on the Inventory Details page, we
 will need to go select our Host. So click **HOSTS**.
 
 Next to each host is a checkbox. Check the box next to each host you
@@ -33,7 +32,7 @@ Fill out this form as follows
 
 | Key                | Value           | Note                                                            |
 |--------------------|-----------------|-----------------------------------------------------------------|
-| Module             | `win_ping`      |                                                                 |
+| Module             | `ping`      |                                                                 |
 | Arguments          |                 | Intentionally blank                                             |
 | Limit              |                 | This will be pre-filled out for you with the hosts you selected |
 | MACHINE CREDENTIAL | Student Account |                                                                 |

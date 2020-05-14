@@ -116,7 +116,7 @@
     - "{{ node2_output.instances }}"
   when: node2_output.instance_ids is not none
 
-- name: Create EC2 instances for node3
+- name: Create EC2 instances for Jenkins
   ec2:
     assign_public_ip: true
     key_name: "{{ ec2_name_prefix }}-key"
@@ -126,16 +126,16 @@
     region: "{{ ec2_region }}"
     exact_count: "{{ student_total }}"
     count_tag:
-      Workshop_node3: "{{ ec2_name_prefix }}-node3"
+      Workshop_jenkins: "{{ ec2_name_prefix }}-jenkins"
     instance_tags:
-      Workshop_node3: "{{ ec2_name_prefix }}-node3"
+      Workshop_jenkins: "{{ ec2_name_prefix }}-jenkins"
       Workshop: "{{ ec2_name_prefix }}"
       Workshop_type: "{{ workshop_type }}"
       AWS_USERNAME: "{{ aws_user }}"
       Info: "AWS_USERNAME that provisioned this-> {{ aws_user }}"
       Linklight: "This was provisioned through the linklight provisioner"
       Students: "{{ student_total }}"
-      short_name: "node3"
+      short_name: "jenkins"
       username: "{{ ec2_info[rhel].username }}"
     wait: "{{ ec2_wait }}"
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
@@ -144,18 +144,18 @@
         volume_type: gp2
         volume_size: "{{ ec2_info[rhel].disk_space }}"
         delete_on_termination: true
-  register: node3_output
+  register: jenkins_output
 
-- name: Ensure tags are present for node3
+- name: Ensure tags are present for jenkins
   ec2_tag:
     region: "{{ ec2_region }}"
     resource: "{{ item.1.id }}"
     state: present
     tags:
-      Name: "{{ ec2_name_prefix }}-student{{ item.0 + 1 }}-node3"
+      Name: "{{ ec2_name_prefix }}-student{{ item.0 + 1 }}-jenkins"
       Index: "{{ item[0] }}"
       Student: "student{{ item.0 + 1 }}"
       launch_time: "{{ item.1.launch_time }}"
   with_indexed_items:
-    - "{{ node3_output.instances }}"
-  when: node3_output.instance_ids is not none
+    - "{{ jenkins_output.instances }}"
+  when: jenkins_output.instance_ids is not none

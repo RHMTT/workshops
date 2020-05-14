@@ -6,7 +6,7 @@ ec2_name_prefix: TESTWORKSHOP
 # amount of work benches to provision
 student_total: 2
 # workshop is put into rhel mode
-workshop_type: rhel
+workshop_type: cicd
 ## Optional Variables
 # password used for student account on control node
 admin_password: ansible
