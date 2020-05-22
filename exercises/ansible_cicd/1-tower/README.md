@@ -216,15 +216,4 @@ If you click the **HOSTS** button, you can view the hosts belonging to the windo
 
 This is the IP address of this particular server
 
-**`ansible_password`** 
-
-This is the password needed to connect to this server
-
-**`ansible_user`**
-
-This is the username that Ansible will use along with the password to connect to this server
-
 These variables are very host specific thus have been defined at the host level instead of at the group level.
-
-The authentication settings are particularly important and you will need
-to review them and decide which method is best for your needs.

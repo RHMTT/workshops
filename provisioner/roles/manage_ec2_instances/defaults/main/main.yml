@@ -155,4 +155,12 @@ ec2_info:
     size: t2.xlarge
     username: ec2-user
     architecture: x86_64
+  jenkins:
+    owners: 309956199498
+    size: t2.medium
+    os_type: linux
+    disk_space: 20
+    architecture: x86_64
+    filter: 'RHEL-8*HVM-*Hourly*'
+    username: ec2-user
 debug_teardown: false
