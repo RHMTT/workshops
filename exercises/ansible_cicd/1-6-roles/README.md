@@ -10,7 +10,7 @@ time in the future.
 For this exercise, you are going to take the playbook you just wrote and
 refactor it into a role.
 
-Let’s begin with seeing how your iis-basic-playbook will break down into
+Let’s begin with seeing how your install-apache playbook will break down into
 a role…
 
 Section 1: Create directory structure for your new role
@@ -19,48 +19,48 @@ Section 1: Create directory structure for your new role
 Step 1:
 -------
 
-In Visual Studio Code, navigate to explorer and your *WORKSHOP_PROJECT* section where you previously made `iis_advanced`.
+In Visual Studio Code, navigate to explorer and your *WORKSHOP_PROJECT* 
+Create a directory called **apache** by right-clicking on **WORKSHOP_PROJECT**
+and selecting *New Folder*
 
-![iis\_advanced](images/6-vscode-existing-folders.png)
+![apache\_advanced](images/6-vscode-existing-folders.png)
 
-Select the **iis_advanced** folder.
+Select the **apache** folder.
 
-Create a directory called **roles** by right-clicking on **iis_advanced**
+Create a directory called **roles** by right-clicking on **apache**
 and selecting *New Folder*
 
 Now right-click **roles** and create a new folder underneath called
-`iis_simple`.
+`apache_simple`.
 
 Step 2:
 -------
 
-Within *iis\_simple* create new folders as follows:
+We want to create a role structure and Ansible can create this for us using the ansible-galaxy command, in VSC click on Terminal at the top and select New Terminal
 
-- defaults
+![apache\_advanced](images/6-vscode-new-terminal.png)
 
-- vars
+You will see a terminal window at the bottom of VSC, we can now run the following command to have Ansible create the role directory structure for us
+change into the roles directory
 
-- handlers
+`cd cicd-workshop/workshop_project/apache/roles`
 
-- tasks
+Now execute the following ansible-galaxy command
 
-- templates
+`ansible-galaxy init --offline apache_simple`
+
+![vsc\_galaxy_init](images/6-ansible-galaxy-init.png)
+
+We can see that we now have the full role directory structure created for us.
 
 Step 3:
 -------
 
-Within each of these new folders (except templates), right-click and
-create *New File* Create a file called `main.yml` in each of these
-folders. You will not do this under templates as we will create
-individual template files. This is your basic role structure and
+Within each of these new folders (except templates and files), we can see there is a `main.yml` file pre created for us. The templates and files directory do not have ansible playbooks they are for static files to copy or dynamic templates. This is your basic role structure and
 main.yml will be the default file that the role will use for each
 section.
 
-The finished structure will look like this:
-
-![Role Structure](images/6-create-role.png)
-
-Section 2: Breaking Your `site.yml` Playbook into the Newly Created `iis_simple` Role
+Section 2: Breaking Your `site.yml` Playbook into the Newly Created `apache_simple` Role
 =====================================================================================
 
 In this section, we will separate out the major parts of your playbook
