@@ -1,0 +1,6 @@
+#cloud-config
+hostname: "jenkins"
+fqdn: "jenkins.{{ workshop_dns_zone }}"
+manage_etc_hosts: true
+chpasswd: { expire: False }
+ssh_pwauth: True

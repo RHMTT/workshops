@@ -26,3 +26,17 @@
   set_fact:
     gitlab_ami: >
       {{ amis.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}
+
+- name: find ami fro Jenkins
+  ec2_ami_info:
+    region: "{{ ec2_region }}"
+    owners: "{{ ec2_info['jenkins'].owners }}"
+    filters:
+      name: "{{ ec2_info['jenkins']['filter'] }}"
+      architecture: "{{ ec2_info['jenkins'].architecture }}"
+  register: amis
+
+- name: save ami for Jenkins
+  set_fact:
+    jenkins_ami: >
+      {{ amis.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}
