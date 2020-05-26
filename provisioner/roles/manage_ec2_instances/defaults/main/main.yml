@@ -161,6 +161,6 @@ ec2_info:
     os_type: linux
     disk_space: 20
     architecture: x86_64
-    filter: 'RHEL-8*HVM-*Hourly*'
+    filter: 'RHEL-7*HVM-*Hourly*'
     username: ec2-user
 debug_teardown: false
