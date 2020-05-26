@@ -35,14 +35,12 @@ Complete the form using the following values
 | Name        | Apache Basic Job Template                       |      |
 | Description | Template for the apache basic playbook          |      |
 | JOB TYPE    | Run                                          |      |
-| INVENTORY   | Workshop Inventory                   |      |
+| INVENTORY   | Student Inventory                   |      |
 | PROJECT     | Ansible Workshop Project                     |      |
-| PLAYBOOK    | `iis-basic/install_iis.yml`                  |      |
+| PLAYBOOK    | `install_apache.yml`                  |      |
 | CREDENTIAL  | Type: **Machine**. Name: **Student Account** |      |
 | LIMIT       | web                                      | Checked     |
 | OPTIONS     | [*] ENABLE PRIVILEGE ESCALATION                      |      |
-| EXTRA VARIABLES    | apache_test_message: web server test                                          | Checked     |
-![Create Job Template](images/4-create-job-template.png)
 
 Step 4:
 -------
@@ -76,7 +74,7 @@ Click the rocketship icon ![Add](images/at_launch_icon.png) for the
 Step 3:
 -------
 
-When prompted, You can change the test message we can also change the scope from the web servers to a single node if desired.
+When prompted, we can change the scope from the web servers to a single node if desired.
 
 ![Survey Prompt](images/4-survey-prompt.png)
 
@@ -114,8 +112,12 @@ When the job has successfully completed, you should see a URL to your website pr
 If all went well, you should see something like this, but with your own
 custom message of course.
 
-![New Website with Personalized Test
-Message](images/4-website-output.png)
+Now navigate to both node1 and node2 pages and you should will see the custom message is different on both.
+![Node1
+Message](images/node1-site.png)
+
+![Web Group
+Message](images/node2-site.png)
 
 Extra Credit
 ============
